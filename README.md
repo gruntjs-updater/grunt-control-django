@@ -24,62 +24,75 @@ In your project's Gruntfile, add a section named `control_django` to the data ob
 
 ```js
 grunt.initConfig({
-  control_django: {
-    options: {
-      // Task-specific options go here.
+    control_django: {
+        dev_server_up: {
+            options: {
+                host: 8000,
+                port: 127.0.0.1,
+                // Starts the server
+                always_restart: true,
+            },
+        },
+        test_server_up: {
+            options: {
+                host: host,
+                port: testport,
+                always_restart: true,
+            },
+        },
+        test_server_down: {
+            options: {
+                host: host,
+                port: testport,
+                // Kills the server
+                always_kill: true,
+            },
+        },
     },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
 });
 ```
 
 ### Options
 
-#### options.separator
+#### options.host
 Type: `String`
-Default value: `',  '`
+Default value: `undefined`
 
-A string value that is used to do something with whatever.
+This is the host IP from which you will serve Django, for example: `127.0.0.1`.
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+#### options.port
+Type: `number`
+Default value: `undefined`
 
-A string value that is used to do something else with whatever else.
+This is the port you are serving your Django server from, Eg: `8000`.
 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+In this example, I want to run a Django test server for my end-to-end tests on port `8001`, without bringing down my default Django dev server on port `8000`. The code below shows how to start and stop the server from the Grunt config.
 
 ```js
 grunt.initConfig({
-  control_django: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
+    control_django: {
+      test_server_up: {
+          options: {
+              host: '127.0.0.1',
+              port: '8001',
+              always_restart: true,
+          },
+      },
+      test_server_down: {
+          options: {
+              host: '127.0.0.1',
+              port: '8001',
+              always_kill: true,
+          },
+      },
+    }
 });
-```
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  control_django: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+grunt.registerTask('django-start', 'control_django:test_server_up');
+grunt.registerTask('django-stop', 'control_django:test_server_up');
 ```
 
 ## Contributing
