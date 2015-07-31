@@ -179,7 +179,7 @@ module.exports = function(grunt) {
 
     var commands = {
       getPIDS: "ps -fe | grep 'python manage.py runserver "+opts.host+":"+opts.port+"' | grep -v grep | awk '{print $2}'",
-      run: "python manage.py runserver "+opts.host+":"+opts.port,
+      run: "python manage.py runserver "+opts.host+":"+opts.port + (opts.settings ? ' --settings ' + opts.settings : ''),
       test: "python manage.py test --verbosity 2",
     };
 
