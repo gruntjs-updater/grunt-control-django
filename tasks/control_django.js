@@ -18,12 +18,6 @@ function catchAllErr(e){
   console.error(e);
 }
 
-function verbose(msg){
-  if (1||verbose){
-    console.log(msg);
-  }
-}
-
 
 var errors = {
   1: 'Can\'t kill server because: Server not running.'
@@ -55,39 +49,7 @@ function kill(PIDs){
 
 module.exports = function(grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
-
-  function _spawn(command){
-    return new Promise(function(resolve, reject){
-      var commands = command.split(' ');
-      // console.log( commands[0], commands.slice(1));
-
-      var child = spawn(commands[0], commands.slice(1));
-      // var child = spawn(commands[0], commands.slice(1), { customFds: [0,1,2] });
-      // var child = spawn(commands[0], commands.slice(1), {  stdio: 'inherit' });
-
-      child.stdout.on('data', function (data) {
-        grunt.log.write(data);
-      });
-      child.stderr.on('data', function (data) {
-        grunt.log.write(data);
-      });
-      child.on('close', function (code) {
-        grunt.log.warn('child process closed with code ' + code);
-        reject(code);
-      });
-      child.on('exit', function (code) {
-        grunt.log.warn('child process exited with code ' + code);
-        reject(code);
-      });
-    });
-  }
-
-
-
-
-  grunt.registerMultiTask('control_django', 'Start, stop, test, manage concurrent Django servers.', function() {
+  grunt.registerMultiTask('control_django', 'Start, stop, test, manage concurrent Django servers.', function () {
 
     // Lets go Async!
     var done = this.async();
@@ -100,6 +62,40 @@ module.exports = function(grunt) {
     // console.log(ops);
 
     var target = this.target;
+
+    // Please see the Grunt documentation for more information regarding task
+    // creation: http://gruntjs.com/creating-tasks
+
+    function _spawn(command){
+      return new Promise(function(resolve, reject){
+        var commands = command.split(' ');
+        // console.log( commands[0], commands.slice(1));
+
+        var child = spawn(commands[0], commands.slice(1));
+        // var child = spawn(commands[0], commands.slice(1), { customFds: [0,1,2] });
+        // var child = spawn(commands[0], commands.slice(1), {  stdio: 'inherit' });
+
+        child.stdout.on('data', function (data) {
+          if (opts.stdout) {
+            grunt.log.write(data);
+          }
+        });
+        child.stderr.on('data', function (data) {
+          if (opts.stderr) {
+            grunt.log.write(data);
+          }
+        });
+        child.on('close', function (code) {
+          grunt.log.warn('child process closed with code ' + code);
+          reject(code);
+        });
+        child.on('exit', function (code) {
+          grunt.log.warn('child process exited with code ' + code);
+          reject(code);
+        });
+      });
+    }
+
 
 
     // Cleans the PIDS of linebeaks and spaces from CLI str
